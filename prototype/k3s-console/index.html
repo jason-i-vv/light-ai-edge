@@ -1,0 +1,1791 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BingoEdge Local K3s Console</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #071018;
+      --shell: #050a10;
+      --surface: #0d1722;
+      --surface-2: #111d2a;
+      --surface-3: #162433;
+      --line: #253548;
+      --line-strong: #36506a;
+      --text: #e8f0f7;
+      --text-strong: #f4fbff;
+      --inverse-text: #ffffff;
+      --muted: #8fa2b7;
+      --muted-2: #607489;
+      --accent: #20c7b5;
+      --accent-2: #47a3ff;
+      --accent-weak: rgba(32, 199, 181, .13);
+      --accent-border: rgba(32, 199, 181, .42);
+      --accent-strong-border: rgba(32, 199, 181, .72);
+      --ok: #50d17d;
+      --ok-weak: rgba(80, 209, 125, .12);
+      --ok-border: rgba(80, 209, 125, .42);
+      --warn: #f4c84a;
+      --warn-weak: rgba(244, 200, 74, .13);
+      --warn-border: rgba(244, 200, 74, .42);
+      --bad: #ff6b5f;
+      --bad-weak: rgba(255, 107, 95, .13);
+      --bad-border: rgba(255, 107, 95, .44);
+      --info: #55b7ff;
+      --info-weak: rgba(85, 183, 255, .13);
+      --info-border: rgba(85, 183, 255, .42);
+      --body-grid-a: rgba(44, 70, 95, .22);
+      --body-grid-b: rgba(44, 70, 95, .18);
+      --body-bg: linear-gradient(var(--body-grid-a) 1px, transparent 1px), linear-gradient(90deg, var(--body-grid-b) 1px, transparent 1px), var(--bg);
+      --sidebar-bg: rgba(5, 10, 16, .96);
+      --topbar-bg: rgba(7, 16, 24, .88);
+      --nav-text: #c7d3df;
+      --nav-hover-bg: rgba(255, 255, 255, .04);
+      --nav-hover-border: rgba(255, 255, 255, .06);
+      --local-box-bg: rgba(17, 29, 42, .72);
+      --button-bg: var(--surface-2);
+      --primary-bg: #0f3b3b;
+      --primary-text: #dffffa;
+      --danger-text: #ffd2ce;
+      --danger-border: rgba(255, 107, 95, .58);
+      --danger-bg: rgba(255, 107, 95, .1);
+      --chip-bg: rgba(255, 255, 255, .03);
+      --metric-bg: linear-gradient(180deg, rgba(22, 36, 51, .94), rgba(13, 23, 34, .94));
+      --panel-bg: rgba(13, 23, 34, .94);
+      --panel-head-bg: rgba(17, 29, 42, .62);
+      --toolbar-bg: rgba(7, 16, 24, .5);
+      --input-bg: #08131d;
+      --table-head-bg: #0c1722;
+      --table-hover-bg: rgba(32, 199, 181, .04);
+      --object-bg: rgba(32, 199, 181, .08);
+      --object-border: rgba(32, 199, 181, .38);
+      --progress-track: #1e2b3a;
+      --map-bg: #08131d;
+      --map-grid-a: rgba(54, 80, 106, .35);
+      --map-grid-b: rgba(54, 80, 106, .26);
+      --quick-bg: rgba(7, 16, 24, .42);
+      --overlay-bg: rgba(2, 6, 10, .62);
+      --dialog-bg: #0d1722;
+      --dialog-shadow: 0 24px 80px rgba(0, 0, 0, .45);
+      --dialog-section-bg: rgba(7, 16, 24, .55);
+      --auth-bg: var(--body-bg);
+      --auth-card-bg: var(--panel-bg);
+      --auth-card-border: var(--line-strong);
+      --login-primary-bg: var(--accent);
+      --login-primary-text: #03110f;
+      --brand-glow: 0 0 18px rgba(32, 199, 181, .18);
+      --primary-glow: 0 0 18px rgba(32, 199, 181, .12);
+      --radius: 7px;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #ffffff;
+      --shell: #f4f5f6;
+      --surface: #ffffff;
+      --surface-2: #f7f7f8;
+      --surface-3: #eeeeef;
+      --line: #dddddf;
+      --line-strong: #c7c9cc;
+      --text: #171717;
+      --text-strong: #0f0f10;
+      --inverse-text: #ffffff;
+      --muted: #6f737b;
+      --muted-2: #8b9098;
+      --accent: #007a5a;
+      --accent-2: #2563eb;
+      --accent-weak: rgba(0, 122, 90, .09);
+      --accent-border: rgba(0, 122, 90, .28);
+      --accent-strong-border: rgba(0, 122, 90, .46);
+      --ok: #157347;
+      --ok-weak: rgba(21, 115, 71, .1);
+      --ok-border: rgba(21, 115, 71, .28);
+      --warn: #946200;
+      --warn-weak: rgba(148, 98, 0, .12);
+      --warn-border: rgba(148, 98, 0, .28);
+      --bad: #b42318;
+      --bad-weak: rgba(180, 35, 24, .1);
+      --bad-border: rgba(180, 35, 24, .28);
+      --info: #0969da;
+      --info-weak: rgba(9, 105, 218, .1);
+      --info-border: rgba(9, 105, 218, .28);
+      --body-grid-a: transparent;
+      --body-grid-b: transparent;
+      --body-bg: var(--bg);
+      --sidebar-bg: #f4f5f6;
+      --topbar-bg: #ffffff;
+      --nav-text: #596579;
+      --nav-hover-bg: #eceeef;
+      --nav-hover-border: #e0e2e4;
+      --local-box-bg: #ffffff;
+      --button-bg: #f7f7f8;
+      --primary-bg: #e8f4ef;
+      --primary-text: #00684d;
+      --danger-text: #8f1f17;
+      --danger-border: rgba(180, 35, 24, .32);
+      --danger-bg: rgba(180, 35, 24, .07);
+      --chip-bg: #ffffff;
+      --metric-bg: #ffffff;
+      --panel-bg: #ffffff;
+      --panel-head-bg: #ffffff;
+      --toolbar-bg: #ffffff;
+      --input-bg: #ffffff;
+      --table-head-bg: #fafafa;
+      --table-hover-bg: #f7faf9;
+      --object-bg: rgba(0, 122, 90, .07);
+      --object-border: rgba(0, 122, 90, .2);
+      --progress-track: #e8eaed;
+      --map-bg: #fbfbfc;
+      --map-grid-a: rgba(120, 127, 137, .18);
+      --map-grid-b: rgba(120, 127, 137, .12);
+      --quick-bg: #ffffff;
+      --overlay-bg: rgba(12, 24, 36, .32);
+      --dialog-bg: #ffffff;
+      --dialog-shadow: 0 24px 70px rgba(30, 48, 64, .22);
+      --dialog-section-bg: #f8f8f9;
+      --auth-bg: #f4f4f5;
+      --auth-card-bg: #ffffff;
+      --auth-card-border: #d9dadd;
+      --login-primary-bg: #0b875b;
+      --login-primary-text: #ffffff;
+      --brand-glow: none;
+      --primary-glow: none;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--body-bg);
+      background-size: 28px 28px, 28px 28px, auto;
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 274px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .brand {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--accent-strong-border);
+      border-radius: 8px;
+      color: var(--accent);
+      font-weight: 800;
+      box-shadow: var(--brand-glow);
+    }
+
+    [data-theme="light"] .brand-mark {
+      color: var(--text-strong);
+      border-color: transparent;
+      background: transparent;
+      font-size: 18px;
+    }
+
+    .brand-name {
+      font-weight: 750;
+      font-size: 14px;
+    }
+
+    .brand-sub {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      margin-top: 1px;
+    }
+
+    .nav-section {
+      color: var(--muted-2);
+      font-size: 11px;
+      font-weight: 750;
+      padding: 16px 12px 6px;
+      text-transform: uppercase;
+    }
+
+    .nav-item {
+      width: calc(100% - 16px);
+      height: 34px;
+      margin: 2px 8px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--nav-text);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 10px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .nav-item:hover {
+      background: var(--nav-hover-bg);
+      border-color: var(--nav-hover-border);
+    }
+
+    .nav-item.active {
+      background: var(--accent-weak);
+      border-color: var(--accent-border);
+      color: var(--accent);
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+
+    .nav-icon {
+      width: 16px;
+      color: var(--accent);
+      text-align: center;
+      font-family: var(--mono);
+    }
+
+    .local-box {
+      margin: auto 12px 12px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--local-box-bg);
+    }
+
+    .local-label {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+
+    .local-value {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px 18px;
+      background: var(--topbar-bg);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    .cluster-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .search {
+      width: min(460px, 38vw);
+      height: 34px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--muted);
+    }
+
+    .search input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+    }
+
+    .workspace {
+      padding: 18px;
+      min-width: 0;
+    }
+
+    .page-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .subline {
+      margin-top: 8px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      height: 32px;
+      padding: 0 11px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: var(--button-bg);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      color: var(--text-strong);
+    }
+
+    .btn.primary {
+      border-color: var(--accent-strong-border);
+      background: var(--primary-bg);
+      color: var(--primary-text);
+      box-shadow: var(--primary-glow);
+    }
+
+    .btn.danger {
+      color: var(--danger-text);
+      border-color: var(--danger-border);
+      background: var(--danger-bg);
+    }
+
+    .btn.icon {
+      width: 32px;
+      padding: 0;
+    }
+
+    .tag,
+    .status {
+      display: inline-flex;
+      align-items: center;
+      height: 23px;
+      gap: 6px;
+      padding: 0 8px;
+      border-radius: 99px;
+      border: 1px solid var(--line);
+      background: var(--chip-bg);
+      color: var(--muted);
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .tag.mono {
+      font-family: var(--mono);
+      color: var(--text-strong);
+    }
+
+    .status {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .status::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .ok {
+      color: var(--ok);
+      background: var(--ok-weak);
+      border-color: var(--ok-border);
+    }
+
+    .warn {
+      color: var(--warn);
+      background: var(--warn-weak);
+      border-color: var(--warn-border);
+    }
+
+    .bad {
+      color: var(--bad);
+      background: var(--bad-weak);
+      border-color: var(--bad-border);
+    }
+
+    .info {
+      color: var(--info);
+      background: var(--info-weak);
+      border-color: var(--info-border);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .metric {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--metric-bg);
+      padding: 12px;
+    }
+
+    .metric-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric-value {
+      margin-top: 8px;
+      font-size: 25px;
+      line-height: 1;
+      font-weight: 780;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric-sub {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.42fr) minmax(320px, .78fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-bg);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-head-bg);
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 760;
+    }
+
+    [data-theme="light"] .panel-title {
+      color: var(--accent);
+    }
+
+    .panel-sub {
+      margin-top: 1px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--toolbar-bg);
+    }
+
+    .field,
+    .select {
+      height: 30px;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: var(--input-bg);
+      color: var(--text);
+      outline: 0;
+      padding: 0 9px;
+    }
+
+    .field { width: 250px; }
+    .select { width: 134px; }
+
+    .table-wrap {
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 860px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      color: var(--muted);
+      background: var(--table-head-bg);
+      font-size: 12px;
+      font-weight: 760;
+    }
+
+    tbody tr:hover {
+      background: var(--table-hover-bg);
+    }
+
+    .object-cell {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .object-mark {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      border: 1px solid var(--object-border);
+      color: var(--accent);
+      background: var(--object-bg);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .object-name {
+      font-weight: 730;
+      color: var(--text-strong);
+    }
+
+    .object-meta,
+    .mono {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .progress {
+      width: 88px;
+      height: 7px;
+      display: inline-flex;
+      overflow: hidden;
+      border-radius: 99px;
+      background: var(--progress-track);
+      vertical-align: middle;
+      margin-right: 7px;
+    }
+
+    .progress span {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--accent);
+    }
+
+    .progress.warn span { background: var(--warn); }
+    .progress.bad span { background: var(--bad); }
+
+    .runtime-map {
+      height: 306px;
+      position: relative;
+      background:
+        linear-gradient(var(--map-grid-a) 1px, transparent 1px),
+        linear-gradient(90deg, var(--map-grid-b) 1px, transparent 1px),
+        var(--map-bg);
+      background-size: 22px 22px;
+    }
+
+    .runtime-map svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .runtime-node {
+      position: absolute;
+      width: 126px;
+      min-height: 58px;
+      padding: 8px;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel-bg);
+    }
+
+    .runtime-node strong {
+      display: block;
+      font-size: 12px;
+      color: var(--text-strong);
+    }
+
+    .runtime-node span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .node-a { left: 26px; top: 28px; }
+    .node-b { left: 42%; top: 40px; }
+    .node-c { right: 28px; top: 32px; }
+    .node-d { left: 22%; bottom: 32px; }
+    .node-e { right: 18%; bottom: 28px; }
+
+    .event-list {
+      padding: 4px 0;
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: 82px 1fr;
+      gap: 10px;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .event:last-child {
+      border-bottom: 0;
+    }
+
+    .event-time {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .event-title {
+      font-weight: 720;
+    }
+
+    .event-meta {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .quick {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--quick-bg);
+      padding: 10px;
+      min-width: 0;
+    }
+
+    .quick-title {
+      font-weight: 730;
+    }
+
+    .quick-copy {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 5px 0 10px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 2px;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-head-bg);
+    }
+
+    .tab {
+      height: 38px;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 720;
+      padding: 0 12px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      color: var(--text-strong);
+      border-bottom-color: var(--accent);
+    }
+
+    .drawer {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: var(--overlay-bg);
+    }
+
+    .drawer.open {
+      display: flex;
+    }
+
+    .dialog {
+      width: min(520px, 100%);
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: var(--dialog-bg);
+      box-shadow: var(--dialog-shadow);
+    }
+
+    .dialog-head,
+    .dialog-actions {
+      padding: 13px 15px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .dialog-actions {
+      justify-content: flex-end;
+      border-bottom: 0;
+      border-top: 1px solid var(--line);
+      background: var(--dialog-section-bg);
+    }
+
+    .dialog-title {
+      font-weight: 760;
+      font-size: 15px;
+    }
+
+    .dialog-body {
+      padding: 14px 15px;
+      color: var(--text);
+    }
+
+    .auth-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: var(--auth-bg);
+    }
+
+    .auth-screen.open {
+      display: flex;
+    }
+
+    .login-card {
+      width: min(760px, calc(100vw - 40px));
+      border: 1px solid var(--auth-card-border);
+      border-radius: 8px;
+      background: var(--auth-card-bg);
+      overflow: hidden;
+      box-shadow: 0 18px 48px rgba(15, 23, 42, .08);
+    }
+
+    .login-head {
+      padding: 56px 64px 34px;
+      text-align: center;
+      background: var(--auth-card-bg);
+    }
+
+    .login-title {
+      margin-top: 28px;
+      font-size: 28px;
+      font-weight: 780;
+      color: var(--text-strong);
+    }
+
+    .login-brand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      color: var(--text-strong);
+    }
+
+    .login-brand-mark {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--text-strong);
+      color: var(--auth-card-bg);
+      font-weight: 850;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .login-brand-name {
+      font-size: 48px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .login-body {
+      padding: 0 56px 42px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .login-body .field {
+      width: 100%;
+      height: 46px;
+      font-size: 16px;
+      padding: 0 16px;
+      border-radius: 6px;
+      border-color: var(--line);
+    }
+
+    .login-body .field-label {
+      color: var(--text-strong);
+      font-size: 15px;
+      font-weight: 720;
+      gap: 9px;
+    }
+
+    .login-context {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .login-submit {
+      width: 100%;
+      height: 48px;
+      border: 1px solid var(--login-primary-bg);
+      border-radius: 6px;
+      background: var(--login-primary-bg);
+      color: var(--login-primary-text);
+      font-size: 16px;
+      font-weight: 760;
+      cursor: pointer;
+    }
+
+    .login-submit:hover {
+      filter: brightness(.97);
+    }
+
+    .login-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      padding-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .login-footer button {
+      border: 0;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    @media (max-width: 760px) {
+      .login-head {
+        padding: 34px 24px 22px;
+      }
+
+      .login-body {
+        padding: 0 24px 28px;
+      }
+
+      .login-brand-name {
+        font-size: 34px;
+      }
+
+      .login-title {
+        font-size: 24px;
+        margin-top: 22px;
+      }
+    }
+
+    .field-label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .setting-list {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 38px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--quick-bg);
+    }
+
+    .setting-row strong {
+      color: var(--text-strong);
+    }
+
+    .setting-row span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .impact {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .impact-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--dialog-section-bg);
+    }
+
+    .mobile-switcher {
+      display: none;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 1120px) {
+      .metric-grid,
+      .layout,
+      .settings-grid,
+      .quick-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .mobile-switcher {
+        display: block;
+      }
+
+      .topbar,
+      .page-head {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .search {
+        width: 100%;
+      }
+
+      .workspace {
+        padding: 12px;
+      }
+
+      .metric-grid,
+      .settings-grid,
+      .quick-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field,
+      .select {
+        width: 100%;
+      }
+
+      .toolbar,
+      .actions {
+        align-items: stretch;
+        justify-content: flex-start;
+      }
+
+      .event {
+        grid-template-columns: 1fr;
+        gap: 3px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">BE</div>
+        <div>
+          <div class="brand-name">BingoEdge</div>
+          <div class="brand-sub">LOCAL K3S</div>
+        </div>
+      </div>
+
+      <div class="nav-section">Cluster</div>
+      <button class="nav-item active" data-page="overview"><span class="nav-icon">01</span>总览</button>
+      <button class="nav-item" data-page="objects"><span class="nav-icon">02</span>节点与工作负载</button>
+      <button class="nav-item"><span class="nav-icon">03</span>服务网络</button>
+      <button class="nav-item"><span class="nav-icon">04</span>存储</button>
+
+      <div class="nav-section">Operate</div>
+      <button class="nav-item"><span class="nav-icon">05</span>事件</button>
+      <button class="nav-item"><span class="nav-icon">06</span>备份与升级</button>
+      <button class="nav-item" data-page="settings"><span class="nav-icon">07</span>设置</button>
+
+      <div class="local-box">
+        <div class="local-label">本机访问端点</div>
+        <div class="local-value">https://127.0.0.1:6443</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="cluster-strip">
+          <span class="status ok">API Server Ready</span>
+          <span class="tag mono">edge-k3s-01</span>
+          <span class="tag mono">v1.29.6+k3s1</span>
+          <span class="tag mono">containerd 1.7.15</span>
+          <span class="tag">同步 8 秒前</span>
+          <span class="tag">会话：admin · local</span>
+        </div>
+        <div class="search">
+          <span class="mono">⌕</span>
+          <input placeholder="搜索节点、Pod、服务、事件" aria-label="搜索本机集群对象" />
+        </div>
+        <button class="btn" id="themeToggle" type="button">亮色主题</button>
+        <button class="btn" id="logoutButton" type="button">注销</button>
+      </header>
+
+      <div class="workspace">
+        <select id="mobilePage" class="select mobile-switcher">
+          <option value="overview">总览</option>
+          <option value="objects">节点与工作负载</option>
+          <option value="settings">设置</option>
+        </select>
+
+        <section id="overviewPage">
+          <div class="page-head">
+            <div>
+              <h1>本机 k3s 控制台</h1>
+              <div class="subline">
+                <span>轻量边缘集群</span>
+                <span class="mono">/var/lib/rancher/k3s</span>
+                <span>本页使用模拟数据</span>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn">刷新状态</button>
+              <button class="btn">下载 kubeconfig</button>
+              <button class="btn primary">查看诊断包</button>
+            </div>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric">
+              <div class="metric-label"><span>节点 Ready</span><span>阈值 100%</span></div>
+              <div class="metric-value">5/6</div>
+              <div class="metric-sub">worker-03 出现 MemoryPressure</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label"><span>Pod 健康</span><span>Running</span></div>
+              <div class="metric-value">128/134</div>
+              <div class="metric-sub">4 个 CrashLoopBackOff，2 个 Pending</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label"><span>CPU 分配</span><span>可调度</span></div>
+              <div class="metric-value">64%</div>
+              <div class="metric-sub">剩余 18.4 core，调度安全</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label"><span>内存压力</span><span>需关注</span></div>
+              <div class="metric-value">81%</div>
+              <div class="metric-sub">边缘网关副本重启次数上升</div>
+            </div>
+          </div>
+
+          <div class="layout">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">运行态拓扑</div>
+                  <div class="panel-sub">本机集群的 server / agent / workload 调度关系</div>
+                </div>
+                <span class="status warn">1 个节点有压力</span>
+              </div>
+              <div class="runtime-map">
+                <svg viewBox="0 0 720 306" aria-hidden="true">
+                  <path d="M96 74 C210 66 286 78 366 86" fill="none" stroke="var(--accent)" stroke-width="2" />
+                  <path d="M366 96 C500 78 570 76 640 72" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 6" />
+                  <path d="M120 94 C190 170 250 216 310 244" fill="none" stroke="var(--accent-2)" stroke-width="1.8" />
+                  <path d="M393 106 C430 172 486 214 560 244" fill="none" stroke="var(--warn)" stroke-width="2.2" />
+                  <path d="M310 244 C404 264 474 262 560 244" fill="none" stroke="var(--line-strong)" stroke-width="1.5" />
+                </svg>
+                <div class="runtime-node node-a"><strong>server-01</strong><span>Ready · 10.10.0.11</span></div>
+                <div class="runtime-node node-b"><strong>worker-01</strong><span>Ready · 42 pods</span></div>
+                <div class="runtime-node node-c"><strong>worker-02</strong><span>Ready · 37 pods</span></div>
+                <div class="runtime-node node-d"><strong>worker-03</strong><span>MemoryPressure</span></div>
+                <div class="runtime-node node-e"><strong>edge-gateway</strong><span>Ingress · 4 svc</span></div>
+              </div>
+            </section>
+
+            <aside class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">事件脉冲</div>
+                  <div class="panel-sub">最近 20 分钟，本机 API Server 采样</div>
+                </div>
+                <span class="status bad">3 个告警</span>
+              </div>
+              <div class="event-list" id="overviewEvents"></div>
+            </aside>
+          </div>
+
+          <div class="layout" style="margin-top:14px;">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">节点状态</div>
+                  <div class="panel-sub">可直接判断是否需要排空、暂停调度或查看日志</div>
+                </div>
+                <button class="btn" data-page-open="objects">查看全部</button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>节点</th>
+                      <th>状态</th>
+                      <th>角色</th>
+                      <th>内网 IP</th>
+                      <th>CPU</th>
+                      <th>内存</th>
+                      <th>Pod</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="overviewNodeRows"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <aside class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">轻量操作</div>
+                  <div class="panel-sub">所有风险动作都需要确认影响范围</div>
+                </div>
+              </div>
+              <div class="quick-grid">
+                <div class="quick">
+                  <div class="quick-title">排空节点</div>
+                  <div class="quick-copy">迁移 Pod 前确认剩余容量和 DaemonSet 行为。</div>
+                  <button class="btn danger" data-risk="drain">执行排空</button>
+                </div>
+                <div class="quick">
+                  <div class="quick-title">暂停调度</div>
+                  <div class="quick-copy">将异常节点标记为 unschedulable。</div>
+                  <button class="btn" data-risk="cordon">暂停调度</button>
+                </div>
+                <div class="quick">
+                  <div class="quick-title">备份快照</div>
+                  <div class="quick-copy">生成本机 etcd/sqlite 与配置快照。</div>
+                  <button class="btn primary">立即备份</button>
+                </div>
+                <div class="quick">
+                  <div class="quick-title">升级预检</div>
+                  <div class="quick-copy">检查镜像、磁盘、API 兼容性。</div>
+                  <button class="btn">运行预检</button>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="objectsPage" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1>节点与工作负载</h1>
+              <div class="subline">
+                <span class="mono">edge-k3s-01</span>
+                <span>扁平对象视图</span>
+                <span>模拟数据，不连接真实 API</span>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn">查看 YAML</button>
+              <button class="btn">查看日志</button>
+              <button class="btn primary">创建诊断任务</button>
+            </div>
+          </div>
+
+          <section class="panel">
+            <div class="tabs">
+              <button class="tab active" data-tab="nodes">节点</button>
+              <button class="tab" data-tab="workloads">工作负载</button>
+              <button class="tab" data-tab="events">事件</button>
+            </div>
+
+            <div id="nodesTab">
+              <div class="toolbar">
+                <input id="nodeSearch" class="field" placeholder="筛选节点名、IP、角色" />
+                <select id="nodeStatus" class="select">
+                  <option value="all">全部状态</option>
+                  <option value="ok">Ready</option>
+                  <option value="warn">Pressure</option>
+                  <option value="bad">NotReady</option>
+                </select>
+                <button class="btn" data-risk="cordon">暂停调度</button>
+                <button class="btn danger" data-risk="drain">排空节点</button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>节点</th>
+                      <th>状态</th>
+                      <th>角色</th>
+                      <th>内网 IP</th>
+                      <th>CPU</th>
+                      <th>内存</th>
+                      <th>磁盘</th>
+                      <th>Pod</th>
+                      <th>心跳</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="nodeRows"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="workloadsTab" class="hidden">
+              <div class="toolbar">
+                <input id="workloadSearch" class="field" placeholder="筛选命名空间、名称、镜像" />
+                <select id="namespaceFilter" class="select">
+                  <option value="all">全部命名空间</option>
+                  <option value="edge-system">edge-system</option>
+                  <option value="factory-line">factory-line</option>
+                  <option value="observability">observability</option>
+                </select>
+                <button class="btn">重启</button>
+                <button class="btn">查看日志</button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>工作负载</th>
+                      <th>状态</th>
+                      <th>类型</th>
+                      <th>命名空间</th>
+                      <th>副本</th>
+                      <th>镜像</th>
+                      <th>重启</th>
+                      <th>更新</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="workloadRows"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="eventsTab" class="hidden">
+              <div class="toolbar">
+                <select id="eventSeverity" class="select">
+                  <option value="all">全部级别</option>
+                  <option value="bad">Warning</option>
+                  <option value="warn">Notice</option>
+                  <option value="ok">Normal</option>
+                </select>
+                <button class="btn">导出事件</button>
+              </div>
+              <div class="event-list" id="detailEvents"></div>
+            </div>
+          </section>
+        </section>
+
+        <section id="settingsPage" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1>设置</h1>
+              <div class="subline">
+                <span>本机控制台配置</span>
+                <span class="mono">edge-k3s-01</span>
+                <span>模拟保存，不写入真实配置</span>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn">测试连接</button>
+              <button class="btn primary">保存设置</button>
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">本机访问</div>
+                  <div class="panel-sub">控制台连接 k3s API Server 的基础信息</div>
+                </div>
+                <span class="status ok">Connected</span>
+              </div>
+              <div class="setting-list">
+                <div class="setting-row">
+                  <div><strong>API Server</strong><br><span class="mono">https://127.0.0.1:6443</span></div>
+                  <button class="btn">复制</button>
+                </div>
+                <div class="setting-row">
+                  <div><strong>Kubeconfig</strong><br><span class="mono">~/.kube/config</span></div>
+                  <button class="btn">重新加载</button>
+                </div>
+                <div class="setting-row">
+                  <div><strong>证书状态</strong><br><span>剩余 72 天，到期前 14 天提醒</span></div>
+                  <span class="status ok">Valid</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">登录与会话</div>
+                  <div class="panel-sub">本地 token、会话过期与注销入口</div>
+                </div>
+                <span class="status info">Local</span>
+              </div>
+              <div class="setting-list">
+                <div class="setting-row">
+                  <div><strong>当前用户</strong><br><span>admin · 本地会话 · 45 分钟后过期</span></div>
+                  <button class="btn" id="settingsLogoutButton">注销</button>
+                </div>
+                <div class="setting-row">
+                  <div><strong>访问方式</strong><br><span>密码 / 本地 token / kubeconfig，可按产品需要启用</span></div>
+                  <button class="btn">轮换 token</button>
+                </div>
+                <div class="setting-row">
+                  <div><strong>权限级别</strong><br><span>cluster-admin，用于原型展示风险操作确认</span></div>
+                  <span class="status warn">High Risk</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">运行配置</div>
+                  <div class="panel-sub">镜像、备份、升级和诊断策略</div>
+                </div>
+              </div>
+              <div class="setting-list">
+                <div class="setting-row">
+                  <div><strong>镜像加速</strong><br><span class="mono">registry.local:5000</span></div>
+                  <button class="btn">编辑</button>
+                </div>
+                <div class="setting-row">
+                  <div><strong>备份策略</strong><br><span>每天 02:30，保留 7 份快照</span></div>
+                  <span class="status ok">Enabled</span>
+                </div>
+                <div class="setting-row">
+                  <div><strong>升级通道</strong><br><span class="mono">stable · v1.29.x</span></div>
+                  <button class="btn">预检</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">界面</div>
+                  <div class="panel-sub">主题、密度和诊断采集</div>
+                </div>
+              </div>
+              <div class="setting-list">
+                <div class="setting-row">
+                  <div><strong>主题</strong><br><span>亮色主题为纯背景，暗色主题保留技术网格</span></div>
+                  <button class="btn" id="settingsThemeButton">切换主题</button>
+                </div>
+                <div class="setting-row">
+                  <div><strong>表格密度</strong><br><span>紧凑，适合节点和 Pod 对象扫描</span></div>
+                  <span class="tag">Compact</span>
+                </div>
+                <div class="setting-row">
+                  <div><strong>诊断包</strong><br><span>包含事件、节点摘要、工作负载状态，不含密钥</span></div>
+                  <button class="btn">生成</button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <section class="auth-screen" id="authScreen" aria-labelledby="loginTitle">
+    <div class="login-card">
+      <div class="login-head">
+        <div class="login-brand" aria-label="BingoEdge">
+          <div class="login-brand-mark">BE</div>
+          <div class="login-brand-name">BingoEdge</div>
+        </div>
+        <div class="login-title" id="loginTitle">欢迎回来</div>
+        <div class="panel-sub">登录本机 k3s 控制台，继续管理边缘集群</div>
+      </div>
+      <div class="login-body">
+        <label class="field-label">
+          用户
+          <input class="field" value="admin" />
+        </label>
+        <label class="field-label">
+          密码 / Token
+          <input class="field" type="password" value="edge-k3s-demo" />
+        </label>
+        <label class="field-label">
+          访问端点
+          <input class="field mono" value="https://127.0.0.1:6443" />
+        </label>
+        <div class="login-context">
+          <span class="status ok">连接检查通过</span>
+          <span>模拟登录，不访问真实 API</span>
+        </div>
+        <button class="login-submit" id="loginButton">登录控制台</button>
+        <div class="login-footer">
+          <button type="button">本地文档</button>
+          <button type="button">导入 kubeconfig</button>
+          <button type="button">连接诊断</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="drawer" id="riskDialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <div class="dialog">
+      <div class="dialog-head">
+        <div>
+          <div class="dialog-title" id="dialogTitle">确认本机集群风险操作</div>
+          <div class="panel-sub">原型仅修改模拟状态，不会访问真实 k3s</div>
+        </div>
+        <button class="btn icon" id="closeDialog">×</button>
+      </div>
+      <div class="dialog-body">
+        <span class="status warn" id="dialogStatus">需要确认</span>
+        <p id="dialogCopy">操作将影响 worker-03 上的 Pod 调度。</p>
+        <div class="impact">
+          <div class="impact-row"><span>目标范围</span><strong id="impactScope">worker-03</strong></div>
+          <div class="impact-row"><span>预计影响</span><strong>24 个 Pod，其中 4 个业务 Pod</strong></div>
+          <div class="impact-row"><span>回滚路径</span><strong>恢复调度 / 取消排空</strong></div>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn" id="cancelDialog">取消</button>
+        <button class="btn danger" id="confirmDialog">确认执行</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const nodes = [
+      { name: "server-01", id: "node-10.10.0.11", status: "ok", label: "Ready", role: "server", ip: "10.10.0.11", cpu: 38, mem: 46, disk: 41, pods: "18/110", heartbeat: "8 秒前" },
+      { name: "worker-01", id: "node-10.10.0.21", status: "ok", label: "Ready", role: "agent", ip: "10.10.0.21", cpu: 62, mem: 64, disk: 58, pods: "42/64", heartbeat: "11 秒前" },
+      { name: "worker-02", id: "node-10.10.0.22", status: "ok", label: "Ready", role: "agent", ip: "10.10.0.22", cpu: 58, mem: 69, disk: 61, pods: "37/64", heartbeat: "10 秒前" },
+      { name: "worker-03", id: "node-10.10.0.23", status: "warn", label: "MemoryPressure", role: "agent", ip: "10.10.0.23", cpu: 78, mem: 91, disk: 66, pods: "24/64", heartbeat: "19 秒前" },
+      { name: "gpu-edge-01", id: "node-10.10.0.31", status: "ok", label: "Ready", role: "agent,gpu", ip: "10.10.0.31", cpu: 44, mem: 57, disk: 72, pods: "7/32", heartbeat: "14 秒前" },
+      { name: "worker-04", id: "node-10.10.0.24", status: "bad", label: "NotReady", role: "agent", ip: "10.10.0.24", cpu: 0, mem: 0, disk: 0, pods: "0/64", heartbeat: "7 分钟前" }
+    ];
+
+    const workloads = [
+      { name: "edge-gateway", status: "warn", label: "副本不足", kind: "Deployment", namespace: "edge-system", replicas: "2/3", image: "registry.local/edge/gateway:2026.05.06-2", restarts: 8, updated: "16 分钟前" },
+      { name: "device-shadow-sync", status: "ok", label: "Running", kind: "Deployment", namespace: "factory-line", replicas: "6/6", image: "registry.local/factory/shadow-sync:1.18.4", restarts: 1, updated: "2 天前" },
+      { name: "metrics-agent", status: "ok", label: "Running", kind: "DaemonSet", namespace: "observability", replicas: "5/6", image: "registry.local/edge/metrics:v0.14.7", restarts: 0, updated: "6 天前" },
+      { name: "local-registry-mirror", status: "ok", label: "Running", kind: "StatefulSet", namespace: "edge-system", replicas: "1/1", image: "registry.local/system/registry:2.8", restarts: 0, updated: "12 天前" },
+      { name: "video-infer-worker", status: "bad", label: "CrashLoop", kind: "Deployment", namespace: "factory-line", replicas: "1/3", image: "registry.local/ai/video-infer:0.9.2", restarts: 17, updated: "28 分钟前" }
+    ];
+
+    const events = [
+      { time: "10:48:12", severity: "bad", title: "NodeNotReady", meta: "worker-04 kubelet 心跳超时 · object=node/worker-04" },
+      { time: "10:46:39", severity: "warn", title: "MemoryPressure", meta: "worker-03 memory.available 低于阈值 · object=node/worker-03" },
+      { time: "10:44:03", severity: "bad", title: "BackOff", meta: "video-infer-worker 容器重启退避 · ns=factory-line" },
+      { time: "10:39:50", severity: "warn", title: "Unhealthy", meta: "edge-gateway readiness probe failed · ns=edge-system" },
+      { time: "10:31:16", severity: "ok", title: "SnapshotCreated", meta: "本机配置快照完成 · backup=snap-20260506-1031" }
+    ];
+
+    function statusClass(kind) {
+      return kind === "ok" ? "ok" : kind === "bad" ? "bad" : kind === "info" ? "info" : "warn";
+    }
+
+    function meter(value) {
+      const kind = value >= 88 ? "bad" : value >= 75 ? "warn" : "";
+      return `<span class="progress ${kind}"><span style="width:${value}%"></span></span><span class="mono">${value}%</span>`;
+    }
+
+    function renderNodeRows(target, limit) {
+      const query = (document.querySelector("#nodeSearch")?.value || "").trim().toLowerCase();
+      const status = document.querySelector("#nodeStatus")?.value || "all";
+      const data = nodes.filter(node => {
+        const haystack = `${node.name} ${node.id} ${node.role} ${node.ip}`.toLowerCase();
+        return (!query || haystack.includes(query)) && (status === "all" || node.status === status);
+      }).slice(0, limit || nodes.length);
+
+      document.querySelector(target).innerHTML = data.map(node => `
+        <tr>
+          <td>
+            <div class="object-cell">
+              <span class="object-mark">N</span>
+              <div>
+                <div class="object-name">${node.name}</div>
+                <div class="object-meta">${node.id}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="status ${statusClass(node.status)}">${node.label}</span></td>
+          <td>${node.role}</td>
+          <td class="mono">${node.ip}</td>
+          <td>${meter(node.cpu)}</td>
+          <td>${meter(node.mem)}</td>
+          ${target === "#nodeRows" ? `<td>${meter(node.disk)}</td>` : ""}
+          <td class="mono">${node.pods}</td>
+          ${target === "#nodeRows" ? `<td>${node.heartbeat}</td>` : ""}
+          <td><button class="btn">详情</button></td>
+        </tr>
+      `).join("") || `<tr><td colspan="10">没有符合筛选条件的节点。筛选只作用于模拟数据。</td></tr>`;
+    }
+
+    function renderWorkloads() {
+      const query = document.querySelector("#workloadSearch").value.trim().toLowerCase();
+      const namespace = document.querySelector("#namespaceFilter").value;
+      const data = workloads.filter(item => {
+        const haystack = `${item.name} ${item.namespace} ${item.kind} ${item.image}`.toLowerCase();
+        return (!query || haystack.includes(query)) && (namespace === "all" || item.namespace === namespace);
+      });
+
+      document.querySelector("#workloadRows").innerHTML = data.map(item => `
+        <tr>
+          <td>
+            <div class="object-cell">
+              <span class="object-mark">W</span>
+              <div>
+                <div class="object-name">${item.name}</div>
+                <div class="object-meta">${item.namespace}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="status ${statusClass(item.status)}">${item.label}</span></td>
+          <td>${item.kind}</td>
+          <td>${item.namespace}</td>
+          <td class="mono">${item.replicas}</td>
+          <td class="mono">${item.image}</td>
+          <td class="mono">${item.restarts}</td>
+          <td>${item.updated}</td>
+          <td><button class="btn">日志</button></td>
+        </tr>
+      `).join("") || `<tr><td colspan="9">没有符合筛选条件的工作负载。</td></tr>`;
+    }
+
+    function renderEvents(target, filtered) {
+      const severity = document.querySelector("#eventSeverity")?.value || "all";
+      const data = events.filter(item => !filtered || severity === "all" || item.severity === severity);
+      document.querySelector(target).innerHTML = data.map(item => `
+        <div class="event">
+          <div class="event-time">${item.time}</div>
+          <div>
+            <div class="event-title"><span class="status ${statusClass(item.severity)}">${item.title}</span></div>
+            <div class="event-meta">${item.meta}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function setPage(page) {
+      document.querySelector("#overviewPage").classList.toggle("hidden", page !== "overview");
+      document.querySelector("#objectsPage").classList.toggle("hidden", page !== "objects");
+      document.querySelector("#settingsPage").classList.toggle("hidden", page !== "settings");
+      document.querySelectorAll("[data-page]").forEach(button => {
+        button.classList.toggle("active", button.dataset.page === page);
+      });
+      document.querySelector("#mobilePage").value = page;
+    }
+
+    function setTab(tab) {
+      ["nodes", "workloads", "events"].forEach(name => {
+        document.querySelector(`#${name}Tab`).classList.toggle("hidden", name !== tab);
+      });
+      document.querySelectorAll(".tab").forEach(button => {
+        button.classList.toggle("active", button.dataset.tab === tab);
+      });
+    }
+
+    function openRisk(type) {
+      const drain = type === "drain";
+      document.querySelector("#dialogTitle").textContent = drain ? "排空节点确认" : "暂停调度确认";
+      document.querySelector("#dialogCopy").textContent = drain
+        ? "将对 worker-03 执行 drain，业务 Pod 会尝试迁移到其余 Ready 节点。请确认剩余内存容量足够。"
+        : "将 worker-03 标记为 unschedulable，新 Pod 不会继续调度到该节点，现有 Pod 不会自动迁移。";
+      document.querySelector("#impactScope").textContent = drain ? "node/worker-03" : "node/worker-03 scheduling";
+      document.querySelector("#riskDialog").classList.add("open");
+    }
+
+    document.querySelectorAll("[data-page]").forEach(button => {
+      button.addEventListener("click", () => setPage(button.dataset.page));
+    });
+    document.querySelectorAll("[data-page-open]").forEach(button => {
+      button.addEventListener("click", () => setPage(button.dataset.pageOpen));
+    });
+    document.querySelector("#mobilePage").addEventListener("change", event => setPage(event.target.value));
+    document.querySelectorAll(".tab").forEach(button => {
+      button.addEventListener("click", () => setTab(button.dataset.tab));
+    });
+    document.querySelector("#nodeSearch").addEventListener("input", () => renderNodeRows("#nodeRows"));
+    document.querySelector("#nodeStatus").addEventListener("change", () => renderNodeRows("#nodeRows"));
+    document.querySelector("#workloadSearch").addEventListener("input", renderWorkloads);
+    document.querySelector("#namespaceFilter").addEventListener("change", renderWorkloads);
+    document.querySelector("#eventSeverity").addEventListener("change", () => renderEvents("#detailEvents", true));
+    document.querySelectorAll("[data-risk]").forEach(button => {
+      button.addEventListener("click", () => openRisk(button.dataset.risk));
+    });
+    ["#closeDialog", "#cancelDialog", "#confirmDialog"].forEach(selector => {
+      document.querySelector(selector).addEventListener("click", () => document.querySelector("#riskDialog").classList.remove("open"));
+    });
+
+    function setTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      document.querySelector("#themeToggle").textContent = theme === "light" ? "暗色主题" : "亮色主题";
+      localStorage.setItem("edge-k3s-theme-v2", theme);
+    }
+
+    function setLoggedIn(loggedIn) {
+      document.querySelector("#authScreen").classList.toggle("open", !loggedIn);
+      localStorage.setItem("edge-k3s-auth", loggedIn ? "in" : "out");
+    }
+
+    document.querySelector("#themeToggle").addEventListener("click", () => {
+      const current = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+      setTheme(current === "light" ? "dark" : "light");
+    });
+    document.querySelector("#settingsThemeButton").addEventListener("click", () => {
+      const current = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+      setTheme(current === "light" ? "dark" : "light");
+    });
+    document.querySelector("#loginButton").addEventListener("click", () => setLoggedIn(true));
+    document.querySelector("#logoutButton").addEventListener("click", () => setLoggedIn(false));
+    document.querySelector("#settingsLogoutButton").addEventListener("click", () => setLoggedIn(false));
+
+    setTheme(localStorage.getItem("edge-k3s-theme-v2") === "dark" ? "dark" : "light");
+    setLoggedIn(localStorage.getItem("edge-k3s-auth") !== "out");
+    renderNodeRows("#overviewNodeRows", 5);
+    renderNodeRows("#nodeRows");
+    renderWorkloads();
+    renderEvents("#overviewEvents", false);
+    renderEvents("#detailEvents", true);
+  </script>
+</body>
+</html>

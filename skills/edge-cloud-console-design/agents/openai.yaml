@@ -1,0 +1,8 @@
+interface:
+  display_name: "Edge K3s Console Design"
+  short_description: "Frontier-tech local k3s console taste."
+  brand_color: "#20C7B5"
+  default_prompt: "Use $edge-cloud-console-design to design or review this local edge k3s console UI with frontier-tech aesthetics and a flat lightweight management structure."
+
+policy:
+  allow_implicit_invocation: true
